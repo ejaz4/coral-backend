@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Video {
+  id           String @id @default(uuid())
+  title        String
+  description  String
+  cdnLocation  String
+  thumbnail    String
+  channel      Channel @relation(fields: [channelId], references: [id])
+  channelId    String
+}
+
+model Channel {
+  id              String @id @default(uuid())
+  name            String
+  videos          Video[]
+  subscribers     User[]
+  user            User @relation("owner")
+  profilePicture  String @default("https://coral.video/images/user.svg")
+}
+
+model User {
+  id                String @id @default(uuid())
+  email             String @unique
+  password          String
+  username          String
+  name              String
+  subscribed        Channel[]
+  createdAt         DateTime @default(now())
+  profilePicture    String @default("https://coral.video/images/user.svg")
+  language          Language?
+}
+
+enum Language{
+  en
+  ja
+  fr
+  es
+}
